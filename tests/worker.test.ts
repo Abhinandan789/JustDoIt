@@ -1,4 +1,4 @@
-import { processMissedTaskEmailsWithDeps } from "@/worker/reminder-worker";
+import { processMissedTaskEmailsWithDeps } from "@/lib/reminder-jobs";
 
 const task = {
   id: "task_1",

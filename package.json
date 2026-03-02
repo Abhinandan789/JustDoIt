@@ -12,8 +12,10 @@
     "test:watch": "vitest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
     "prisma:seed": "tsx prisma/seed.ts",
-    "db:init-sqlite": "tsx prisma/init-sqlite.ts"
+    "db:status": "prisma migrate status"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
