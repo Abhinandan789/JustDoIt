@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JustDoIt - Discipline Task Tracker
 
-## Getting Started
+A full-stack Next.js application for discipline-driven task execution.
 
-First, run the development server:
+Core behavior:
+- Users create tasks with an `eodDeadline`.
+- `MISSED` is derived when `status = PENDING` and current time passes `eodDeadline`.
+- A background worker sends one missed-task email and marks `missedEmailSentAt`.
+- Dashboard tracks missed tasks and streaks.
+- Analytics shows completion and focus trends.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+- Next.js 14+ App Router (current scaffold uses Next 16)
+- TypeScript
+- TailwindCSS
+- SQLite (current local runtime fallback in this repo)
+- Prisma ORM
+- Auth.js (`next-auth`) credentials provider
+- Resend (email)
+- node-cron worker
+- Recharts (analytics)
+- Vitest (tests)
+
+## Features
+- Authentication: register/login/logout (credentials)
+- Protected routes: `/dashboard`, `/tasks`, `/analytics`, `/profile`
+- Task CRUD: create, update, delete, complete/reopen
+- Derived status: `PENDING | COMPLETED | MISSED`
+- Missed time indicator: `Missed by X`
+- Worker: overdue pending tasks trigger one email
+- Streaks:
+  - `currentStreak` resets when newly missed tasks are processed
+  - daily rollover increments streak on successful or no-task days
+  - `longestStreak` tracked
+- Analytics metrics:
+  - completed today
+  - completed this week
+  - average completion time
+  - completion rate
+  - missed tasks count
+- Focus timer:
+  - 25/5 Pomodoro
+  - logs `FocusSession`
+
+## Project Structure
+```text
+app/
+  (auth)/login
+  (auth)/register
+  (protected)/dashboard
+  (protected)/tasks
+  (protected)/tasks/new
+  (protected)/tasks/[id]
+  (protected)/analytics
+  (protected)/profile
+  api/auth/[...nextauth]
+actions/
+components/
+lib/
+worker/
+prisma/
+utils/
+tests/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
+1. Node.js 20+
+2. npm
+3. No separate DB server required for current local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create environment file:
+   ```bash
+   copy .env.example .env
+   ```
+3. Update `.env` values (auth secret, resend key).
+4. Generate Prisma client:
+   ```bash
+   npm run prisma:generate
+   ```
+5. Initialize local database schema:
+   ```bash
+   npm run db:init-sqlite
+   ```
+6. (Optional) seed demo user:
+   ```bash
+   npm run prisma:seed
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Run Locally
+1. Start Next.js app:
+   ```bash
+   npm run dev
+   ```
+2. Start reminder worker in a second terminal:
+   ```bash
+   npm run worker
+   ```
+3. Open `http://localhost:3000`
 
-## Learn More
+## Worker Logic
+Cron runs every minute and processes tasks where:
+- `status = PENDING`
+- `missedEmailSentAt IS NULL`
+- `eodDeadline <= now`
 
-To learn more about Next.js, take a look at the following resources:
+For each matched task:
+1. Send `Task Not Completed` email via Resend.
+2. On success, set `missedEmailSentAt`.
+3. Reset user `currentStreak` to `0`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Testing
+Run tests:
+```bash
+npm run test
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Covered:
+- authentication credential verification
+- task CRUD server action behavior
+- MISSED detection
+- worker behavior and safety
+- email sending logic
+- focus session logging
+- streak helper logic
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- No AI features/endpoints/dependencies are included.
+- `MISSED` is intentionally derived in code, not stored as a DB enum value.
+- With Next.js 16, `middleware.ts` is still supported but warns to migrate to `proxy.ts` in the future.
