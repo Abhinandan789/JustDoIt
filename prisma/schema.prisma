@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  email         String         @unique
+  passwordHash  String
+  profileImage  String?
+  timezone      String         @default("UTC")
+  currentStreak Int            @default(0)
+  longestStreak Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tasks         Task[]
+  focusSessions FocusSession[]
+}
+
+model Task {
+  id                String        @id @default(cuid())
+  title             String
+  description       String?
+  status            TaskStatus    @default(PENDING)
+  priority          TaskPriority  @default(MEDIUM)
+  eodDeadline       DateTime
+  missedEmailSentAt DateTime?
+  completedAt       DateTime?
+  userId            String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focusSessions     FocusSession[]
+
+  @@index([userId, status])
+  @@index([status, eodDeadline, missedEmailSentAt])
+  @@index([userId, eodDeadline])
+}
+
+model FocusSession {
+  id          String   @id @default(cuid())
+  taskId      String?
+  userId      String
+  duration    Int
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  task        Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt])
+  @@index([taskId])
+}
