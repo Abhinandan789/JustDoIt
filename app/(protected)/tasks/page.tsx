@@ -1,20 +1,56 @@
 import Link from "next/link";
 
+import { buttonClass } from "@/lib/button-styles";
+import {
+  applyTaskQuery,
+  getTaskFilterCounts,
+  normalizeTaskSearch,
+  parseTaskFilter,
+  parseTaskSort,
+  selectUpcomingTasks,
+} from "@/lib/task-list";
+import { TasksToolbar } from "@/components/TasksToolbar";
 import { TaskCard } from "@/components/TaskCard";
+import { UpcomingDeadlinesPanel } from "@/components/UpcomingDeadlinesPanel";
 import { getRequiredUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export default async function TasksPage() {
+type SearchParamValue = string | string[] | undefined;
+
+type TasksPageProps = {
+  searchParams?: Promise<Record<string, SearchParamValue>>;
+};
+
+function firstParam(value: SearchParamValue) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function TasksPage({ searchParams }: TasksPageProps) {
   const user = await getRequiredUser();
 
   if (!user) {
     return null;
   }
 
+  const resolvedParams: Record<string, SearchParamValue> = await Promise.resolve(searchParams ?? {});
+  const filter = parseTaskFilter(firstParam(resolvedParams.status));
+  const sort = parseTaskSort(firstParam(resolvedParams.sort));
+  const query = normalizeTaskSearch(firstParam(resolvedParams.q));
+  const now = new Date();
+
   const tasks = await prisma.task.findMany({
     where: { userId: user.id },
-    orderBy: [{ status: "asc" }, { eodDeadline: "asc" }],
   });
+
+  const counts = getTaskFilterCounts(tasks, now);
+  const visibleTasks = applyTaskQuery({
+    tasks,
+    filter,
+    sort,
+    query,
+    now,
+  });
+  const upcomingTasks = selectUpcomingTasks(tasks, now, 5);
 
   return (
     <div className="space-y-6">
@@ -25,25 +61,38 @@ export default async function TasksPage() {
         </div>
         <Link
           href="/tasks/new"
-          className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98]"
+          className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
         >
           Create Task
         </Link>
       </header>
 
-      {tasks.length === 0 ? (
-        <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
-          No tasks created yet.
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} timezone={user.timezone} />
-          ))}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-4">
+          <TasksToolbar filter={filter} sort={sort} query={query} total={tasks.length} shown={visibleTasks.length} counts={counts} />
+
+          {tasks.length === 0 ? (
+            <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
+              No tasks created yet.
+            </p>
+          ) : visibleTasks.length === 0 ? (
+            <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
+              No tasks match the current filters.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {visibleTasks.map((task) => (
+                <TaskCard key={task.id} task={task} timezone={user.timezone} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="xl:sticky xl:top-6 xl:self-start">
+          <UpcomingDeadlinesPanel tasks={upcomingTasks} timezone={user.timezone} />
+        </div>
+      </div>
     </div>
   );
 }
-
 

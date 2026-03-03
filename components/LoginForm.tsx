@@ -4,6 +4,8 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { buttonClass } from "@/lib/button-styles";
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -73,7 +75,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        className={buttonClass("primary", "w-full px-4 py-2 text-sm font-semibold")}
       >
         {pending ? "Logging in..." : "Login"}
       </button>

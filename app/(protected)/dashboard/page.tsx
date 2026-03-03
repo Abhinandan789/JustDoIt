@@ -5,6 +5,7 @@ import { DashboardStats } from "@/components/DashboardStats";
 import { ReminderPanel } from "@/components/ReminderPanel";
 import { TaskCard } from "@/components/TaskCard";
 import { getRequiredUser } from "@/lib/auth";
+import { buttonClass } from "@/lib/button-styles";
 import { getDashboardStats, getRecentTasks, getUpcomingMissedNotifications } from "@/lib/analytics";
 
 export default async function DashboardPage() {
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/tasks/new"
-          className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98]"
+          className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
         >
           New Task
         </Link>

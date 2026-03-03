@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { updateProfileAction } from "@/actions/profile-actions";
+import { buttonClass } from "@/lib/button-styles";
 import { initialActionState } from "@/types/actions";
 
 function SaveButton() {
@@ -13,7 +14,7 @@ function SaveButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
     >
       {pending ? "Saving..." : "Save profile"}
     </button>
