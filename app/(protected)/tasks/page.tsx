@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { buttonClass } from "@/lib/button-styles";
 import {
   applyTaskQuery,
   getTaskFilterCounts,
@@ -60,7 +61,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
         </div>
         <Link
           href="/tasks/new"
-          className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98]"
+          className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
         >
           Create Task
         </Link>

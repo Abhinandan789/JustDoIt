@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { logFocusSessionAction } from "@/actions/focus-actions";
+import { buttonClass } from "@/lib/button-styles";
 
 const FOCUS_SECONDS = 25 * 60;
 const BREAK_SECONDS = 5 * 60;
@@ -100,14 +101,14 @@ export function FocusTimer({ tasks }: FocusTimerProps) {
         <button
           type="button"
           onClick={() => setIsRunning((value) => !value)}
-          className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98]"
+          className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
         >
           {isRunning ? "Pause" : "Start"}
         </button>
         <button
           type="button"
           onClick={reset}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-100 active:scale-[0.98] dark:border-[#303030] dark:text-gray-100 dark:hover:bg-[#202020]"
+          className={buttonClass("secondary", "px-4 py-2 text-sm font-semibold")}
         >
           Reset
         </button>

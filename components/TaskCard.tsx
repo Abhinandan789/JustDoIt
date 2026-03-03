@@ -2,6 +2,7 @@ import { TaskPriority, TaskStatus } from "@prisma/client";
 
 import { completeTaskSubmitAction, deleteTaskSubmitAction } from "@/actions/task-actions";
 import { EditTaskModal } from "@/components/EditTaskModal";
+import { buttonClass } from "@/lib/button-styles";
 import { getMissedByLabel, getTaskDisplayStatus } from "@/lib/reminders";
 import { formatForTimezone } from "@/lib/timezone";
 import { cn } from "@/utils/format";
@@ -69,7 +70,7 @@ export function TaskCard({ task, timezone }: TaskCardProps) {
           <input type="hidden" name="id" value={task.id} />
           <button
             type="submit"
-            className="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98]"
+            className={buttonClass("primary", "px-3 py-2 text-sm font-medium")}
           >
             {task.status === "COMPLETED" ? "Reopen" : "Complete"}
           </button>
@@ -81,7 +82,7 @@ export function TaskCard({ task, timezone }: TaskCardProps) {
           <input type="hidden" name="id" value={task.id} />
           <button
             type="submit"
-            className="rounded-lg border border-rose-300 px-3 py-2 text-sm font-medium text-rose-700 transition-all duration-200 hover:bg-rose-100 active:scale-[0.98] dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950/40"
+            className={buttonClass("danger", "px-3 py-2 text-sm font-medium")}
           >
             Delete
           </button>

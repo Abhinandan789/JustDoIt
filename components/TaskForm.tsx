@@ -4,6 +4,7 @@ import { TaskPriority } from "@prisma/client";
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 
+import { buttonClass } from "@/lib/button-styles";
 import { initialActionState, type ActionState } from "@/types/actions";
 
 type TaskFormProps = {
@@ -26,7 +27,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-rose-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      className={buttonClass("primary", "px-4 py-2 text-sm font-semibold")}
     >
       {pending ? "Saving..." : label}
     </button>

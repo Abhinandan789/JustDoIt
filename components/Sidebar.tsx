@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
+import { buttonClass } from "@/lib/button-styles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/utils/format";
 
@@ -67,7 +68,7 @@ export function Sidebar({ username, profileImage }: SidebarProps) {
       <button
         type="button"
         onClick={() => signOut({ callbackUrl: "/login" })}
-        className="mt-6 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-100 active:scale-[0.98] dark:border-[#303030] dark:text-gray-400 dark:hover:bg-[#202020] dark:hover:text-gray-100"
+        className={buttonClass("secondary", "mt-6 w-full px-3 py-2 text-sm font-medium")}
       >
         Logout
       </button>
