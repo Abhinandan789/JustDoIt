@@ -6,9 +6,11 @@ import {
   normalizeTaskSearch,
   parseTaskFilter,
   parseTaskSort,
+  selectUpcomingTasks,
 } from "@/lib/task-list";
 import { TasksToolbar } from "@/components/TasksToolbar";
 import { TaskCard } from "@/components/TaskCard";
+import { UpcomingDeadlinesPanel } from "@/components/UpcomingDeadlinesPanel";
 import { getRequiredUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -47,6 +49,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     query,
     now,
   });
+  const upcomingTasks = selectUpcomingTasks(tasks, now, 5);
 
   return (
     <div className="space-y-6">
@@ -63,23 +66,31 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
         </Link>
       </header>
 
-      <TasksToolbar filter={filter} sort={sort} query={query} total={tasks.length} shown={visibleTasks.length} counts={counts} />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-4">
+          <TasksToolbar filter={filter} sort={sort} query={query} total={tasks.length} shown={visibleTasks.length} counts={counts} />
 
-      {tasks.length === 0 ? (
-        <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
-          No tasks created yet.
-        </p>
-      ) : visibleTasks.length === 0 ? (
-        <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
-          No tasks match the current filters.
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {visibleTasks.map((task) => (
-            <TaskCard key={task.id} task={task} timezone={user.timezone} />
-          ))}
+          {tasks.length === 0 ? (
+            <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
+              No tasks created yet.
+            </p>
+          ) : visibleTasks.length === 0 ? (
+            <p className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-400">
+              No tasks match the current filters.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {visibleTasks.map((task) => (
+                <TaskCard key={task.id} task={task} timezone={user.timezone} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="xl:sticky xl:top-6 xl:self-start">
+          <UpcomingDeadlinesPanel tasks={upcomingTasks} timezone={user.timezone} />
+        </div>
+      </div>
     </div>
   );
 }
