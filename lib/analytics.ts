@@ -119,41 +119,74 @@ export async function getAnalytics(userId: string, timezone: string) {
         );
 
   const chartWindowStart = subDays(now, 6);
-  const days = eachDayOfInterval({ start: startOfDay(chartWindowStart), end: startOfDay(now) });
+  const chartWindowBounds = {
+    start: fromZonedTime(startOfDay(toZonedTime(chartWindowStart, timezone)), timezone),
+    end: fromZonedTime(endOfDay(toZonedTime(now, timezone)), timezone),
+  };
 
-  const [completionSeries, focusSeries] = await Promise.all([
-    Promise.all(
-      days.map(async (day) => {
-        const bounds = getUtcBoundsForDay(day, timezone);
-        const count = await prisma.task.count({
-          where: {
-            userId,
-            status: "COMPLETED",
-            completedAt: { gte: bounds.start, lte: bounds.end },
-          },
-        });
-
-        return { day: format(day, "EEE"), completions: count };
-      }),
-    ),
-    Promise.all(
-      days.map(async (day) => {
-        const bounds = getUtcBoundsForDay(day, timezone);
-        const sessions = await prisma.focusSession.findMany({
-          where: {
-            userId,
-            completedAt: { gte: bounds.start, lte: bounds.end },
-          },
-          select: { duration: true },
-        });
-
-        return {
-          day: format(day, "EEE"),
-          minutes: sessions.reduce((sum, item) => sum + item.duration, 0),
-        };
-      }),
-    ),
+  /**
+   * OPTIMIZATION: Batch 7-day queries into 2 instead of 14 separate queries
+   * Previously: 7 queries for task completions + 7 queries for focus sessions
+   * Now: 1 query for all task completions + 1 query for all focus sessions
+   * Then group by day in-memory
+   */
+  const [sevenDayCompletedTasks, sevenDayFocusSessions] = await Promise.all([
+    prisma.task.findMany({
+      where: {
+        userId,
+        status: "COMPLETED",
+        completedAt: {
+          gte: chartWindowBounds.start,
+          lte: chartWindowBounds.end,
+        },
+      },
+      select: { completedAt: true },
+    }),
+    prisma.focusSession.findMany({
+      where: {
+        userId,
+        completedAt: {
+          gte: chartWindowBounds.start,
+          lte: chartWindowBounds.end,
+        },
+      },
+      select: { duration: true, completedAt: true },
+    }),
   ]);
+
+  // Group tasks by day (in-memory)
+  const days = eachDayOfInterval({ start: startOfDay(chartWindowStart), end: startOfDay(now) });
+  const completionSeries = days.map((day) => {
+    const bounds = getUtcBoundsForDay(day, timezone);
+    const completions = sevenDayCompletedTasks.filter(
+      (task) =>
+        task.completedAt &&
+        task.completedAt.getTime() >= bounds.start.getTime() &&
+        task.completedAt.getTime() <= bounds.end.getTime(),
+    ).length;
+
+    return {
+      day: format(day, "EEE"),
+      completions,
+    };
+  });
+
+  // Group focus sessions by day (in-memory)
+  const focusSeries = days.map((day) => {
+    const bounds = getUtcBoundsForDay(day, timezone);
+    const minutes = sevenDayFocusSessions
+      .filter(
+        (session) =>
+          session.completedAt.getTime() >= bounds.start.getTime() &&
+          session.completedAt.getTime() <= bounds.end.getTime(),
+      )
+      .reduce((sum, session) => sum + session.duration, 0);
+
+    return {
+      day: format(day, "EEE"),
+      minutes,
+    };
+  });
 
   return {
     tasksCompletedToday,
