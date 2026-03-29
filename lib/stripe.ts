@@ -1,8 +1,18 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-04-10",
-});
+let stripe: Stripe | null = null;
+
+function getStripeClient(): Stripe {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is required");
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2026-03-25.dahlia",
+    });
+  }
+  return stripe;
+}
 
 export const PRICING_PLANS = {
   FREE: {
@@ -53,7 +63,7 @@ export async function createCheckoutSession(
   priceId: string,
   currentTier: string,
 ): Promise<string> {
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripeClient().checkout.sessions.create({
     customer_email: email,
     client_reference_id: userId,
     line_items: [
@@ -84,7 +94,7 @@ export async function createCheckoutSession(
 export async function createBillingPortalSession(
   customerId: string,
 ): Promise<string> {
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripeClient().billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXTAUTH_URL}/profile`,
   });
@@ -98,7 +108,7 @@ export async function createBillingPortalSession(
 export async function getCustomerSubscription(
   customerId: string,
 ): Promise<Stripe.Subscription | null> {
-  const subscriptions = await stripe.subscriptions.list({
+  const subscriptions = await getStripeClient().subscriptions.list({
     customer: customerId,
     limit: 1,
   });
@@ -137,10 +147,12 @@ export async function handleStripeWebhook(
         }
       }
 
-      // Calculate expiration date
+      // Calculate expiration date (handle API version differences)
+      const subData = subscription as any;
+      const currentPeriodEnd = subData.current_period_end || subData.billing_cycle_anchor;
       const expiresAt =
-        subscription.current_period_end && subscription.status === "active"
-          ? new Date(subscription.current_period_end * 1000)
+        currentPeriodEnd && subscription.status === "active"
+          ? new Date(currentPeriodEnd * 1000)
           : null;
 
       await onSubscriptionUpdate(userId, tier, expiresAt, customerId);
@@ -188,7 +200,7 @@ export function verifyStripeWebhookSignature(
   signature: string,
   secret: string,
 ): Stripe.Event {
-  return stripe.webhooks.constructEvent(body, signature, secret);
+  return getStripeClient().webhooks.constructEvent(body, signature, secret);
 }
 
 /**

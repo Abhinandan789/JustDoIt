@@ -75,9 +75,9 @@ export function SubscriptionPlans({
                 ))}
               </ul>
 
-              {!isCurrent && isHigher && plan.priceId && (
+              {!isCurrent && isHigher && "priceId" in plan && (plan as any).priceId && (
                 <button
-                  onClick={() => handleUpgrade(plan.priceId!)}
+                  onClick={() => handleUpgrade((plan as any).priceId)}
                   disabled={isLoading || upgrading !== null}
                   className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
                     key === "ENTERPRISE"
