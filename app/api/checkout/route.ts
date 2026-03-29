@@ -20,10 +20,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate price ID against known plans
-    const validPriceIds = Object.values(PRICING_PLANS)
-      .filter((plan) => plan.priceId)
-      .map((plan) => plan.priceId);
+    // Validate price ID against known plans (only paid plans have priceId)
+    const validPriceIds: string[] = [];
+    
+    if (PRICING_PLANS.PRO.priceId) {
+      validPriceIds.push(PRICING_PLANS.PRO.priceId);
+    }
+    
+    if (PRICING_PLANS.ENTERPRISE.priceId) {
+      validPriceIds.push(PRICING_PLANS.ENTERPRISE.priceId);
+    }
 
     if (!validPriceIds.includes(priceId)) {
       return NextResponse.json(
