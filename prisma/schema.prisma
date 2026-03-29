@@ -52,6 +52,8 @@ model Task {
   @@index([userId, status])
   @@index([status, eodDeadline, missedEmailSentAt])
   @@index([userId, eodDeadline])
+  @@index([userId, createdAt])
+  @@index([userId, status, eodDeadline])
 }
 
 model FocusSession {
@@ -66,4 +68,5 @@ model FocusSession {
 
   @@index([userId, completedAt])
   @@index([taskId])
+  @@index([userId, taskId])
 }
