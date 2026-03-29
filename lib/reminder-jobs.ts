@@ -116,7 +116,7 @@ export async function processMissedTaskEmailsWithDeps(deps: MissedEmailDeps, now
     } else {
       failureCount++;
       const reason = emailResult?.error || result.error?.message || "unknown error";
-      deps.logger.warn(`Failed to send email for task after ${result.attemptsMade} attempts`, {
+      deps.logger.error(`Failed to send email for task after ${result.attemptsMade} attempts`, {
         meta: { taskId, attempts: result.attemptsMade, reason },
       });
     }

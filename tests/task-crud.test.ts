@@ -7,6 +7,7 @@ const mocked = vi.hoisted(() => ({
       findFirst: vi.fn(),
       update: vi.fn(),
       deleteMany: vi.fn(),
+      count: vi.fn().mockResolvedValue(10), // Mock for task limit checking
     },
   },
 }));
@@ -32,7 +33,13 @@ import { completeTaskAction, createTaskAction, deleteTaskAction } from "@/action
 describe("task CRUD actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocked.getRequiredUser.mockResolvedValue({ id: "user_1", timezone: "UTC" });
+    mocked.getRequiredUser.mockResolvedValue({
+      id: "user_1",
+      timezone: "UTC",
+      tier: "FREE",
+      tasksLimit: 50,
+      subscriptionExpiresAt: null,
+    });
   });
 
   it("creates a task scoped to authenticated user", async () => {
