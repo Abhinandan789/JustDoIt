@@ -107,23 +107,39 @@ export async function retryWithBackoff<T>(
 
 /**
  * Batch execute operations with retry, collecting results
- * Useful for processing multiple async tasks with error handling
+ * Processes operations with concurrency limiting to prevent overwhelming services
+ *
+ * @param operations - Array of operations to execute
+ * @param config - Retry configuration
+ * @param concurrencyLimit - Maximum concurrent operations (default: 5)
  */
 export async function retryBatch<T>(
   operations: Array<{ id: string; operation: RetryableOperation<T> }>,
-  config: Partial<RetryConfig> = {}
+  config: Partial<RetryConfig> = {},
+  concurrencyLimit = 5
 ): Promise<
   Array<{
     id: string;
     result: RetryResult<T>;
   }>
 > {
-  return Promise.all(
-    operations.map(async ({ id, operation }) => ({
-      id,
-      result: await retryWithBackoff(operation, config),
-    }))
-  );
+  const results: Array<{ id: string; result: RetryResult<T> }> = [];
+  
+  // Process operations in chunks to limit concurrency
+  for (let i = 0; i < operations.length; i += concurrencyLimit) {
+    const chunk = operations.slice(i, i + concurrencyLimit);
+    
+    const chunkResults = await Promise.all(
+      chunk.map(async ({ id, operation }) => ({
+        id,
+        result: await retryWithBackoff(operation, config),
+      }))
+    );
+    
+    results.push(...chunkResults);
+  }
+  
+  return results;
 }
 
 /**

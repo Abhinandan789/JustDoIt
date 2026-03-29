@@ -312,9 +312,9 @@ Content-Type: application/json
 ```
 
 **X-Signature Header**:
-Generated with HMAC-SHA256 of request body using `CRON_HMAC_SECRET`:
+Generated with HMAC-SHA256 of request body using `CRON_SECRET`:
 ```bash
-signature=$(echo -n <body> | openssl dgst -sha256 -hmac $CRON_HMAC_SECRET -binary | base64)
+signature=$(echo -n <body> | openssl dgst -sha256 -hmac $CRON_SECRET -binary | xxd -p -c 256)
 ```
 
 **Response** (200 OK):

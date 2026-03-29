@@ -30,7 +30,7 @@ NEXTAUTH_URL=https://yourdomain.com
 RESEND_API_KEY=re_your_api_key_here
 
 # CRON Job Security (generate with: openssl rand -base64 32)
-CRON_HMAC_SECRET=your-generated-cron-secret-here
+CRON_SECRET=your-generated-cron-secret-here
 
 # Stripe (for subscription tiers)
 STRIPE_SECRET_KEY=sk_live_your_stripe_key_here
@@ -98,7 +98,7 @@ vercel link
 vercel env add DATABASE_URL
 vercel env add NEXTAUTH_SECRET
 vercel env add RESEND_API_KEY
-vercel env add CRON_HMAC_SECRET
+vercel env add CRON_SECRET
 # ... add all env variables
 
 # Deploy to production
@@ -163,7 +163,7 @@ Already configured in middleware for API endpoints
 - Only requests with valid X-Signature header accepted
 - IP logging for unauthorized attempts
 
-Set CRON_HMAC_SECRET in production environment.
+Set CRON_SECRET in production environment.
 
 ### 4. Database Connection
 - PostgreSQL connection pooling enabled via Prisma
@@ -342,7 +342,7 @@ vercel deploy --prod  # or redeploy previous Docker image
 - Rebuild application
 
 **"CRON job returns 401"**
-- Verify CRON_HMAC_SECRET matches X-Signature header
+- Verify CRON_SECRET matches X-Signature header
 - Check CRON service can reach your domain (no firewall blocks)
 
 ### Logs Location

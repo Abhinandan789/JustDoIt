@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { processMissedTaskEmailsWithDeps } from "@/lib/reminder-jobs";
-import type { Logger } from "@/lib/logger";
+import type { LoggerLike } from "@/lib/logger";
 
 const task = {
   id: "task_1",
@@ -14,7 +14,7 @@ const task = {
   },
 };
 
-const mockLogger: Logger = {
+const mockLogger: LoggerLike = {
   debug: vi.fn(),
   info: vi.fn(),
   warn: vi.fn(),

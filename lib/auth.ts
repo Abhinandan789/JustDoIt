@@ -70,10 +70,27 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token.id) {
+        // Fetch user from database to get billing fields
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            tier: true,
+            stripeCustomerId: true,
+          },
+        });
+
         session.user.id = token.id as string;
         session.user.username = (token.username as string) ?? session.user.name ?? "";
         session.user.timezone = (token.timezone as string) ?? "UTC";
+
+        // Add billing fields to session
+        if (dbUser) {
+          Object.assign(session.user, {
+            tier: dbUser.tier,
+            stripeCustomerId: dbUser.stripeCustomerId,
+          });
+        }
       }
 
       return session;

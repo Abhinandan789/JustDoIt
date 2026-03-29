@@ -115,6 +115,7 @@ export async function handleStripeWebhook(
     userId: string,
     tier: string,
     expiresAt: Date | null,
+    customerId?: string,
   ) => Promise<void>,
 ): Promise<void> {
   switch (event.type) {
@@ -122,6 +123,7 @@ export async function handleStripeWebhook(
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       const userId = subscription.metadata?.userId;
+      const customerId = subscription.customer as string;
 
       if (!userId || !onSubscriptionUpdate) break;
 
@@ -141,18 +143,19 @@ export async function handleStripeWebhook(
           ? new Date(subscription.current_period_end * 1000)
           : null;
 
-      await onSubscriptionUpdate(userId, tier, expiresAt);
+      await onSubscriptionUpdate(userId, tier, expiresAt, customerId);
       break;
     }
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       const userId = subscription.metadata?.userId;
+      const customerId = subscription.customer as string;
 
       if (!userId || !onSubscriptionUpdate) break;
 
       // Downgrade to FREE tier
-      await onSubscriptionUpdate(userId, "FREE", null);
+      await onSubscriptionUpdate(userId, "FREE", null, customerId);
       break;
     }
 

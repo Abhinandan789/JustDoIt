@@ -34,7 +34,7 @@
 
 ### Application Security
 - [ ] NEXTAUTH_SECRET is strong (32+ char random)
-- [ ] CRON_HMAC_SECRET is strong (32+ char random)
+- [ ] CRON_SECRET is strong (32+ char random)
 - [ ] Database passwords are strong (16+ char)
 - [ ] API keys are never committed to git
 - [ ] Environment variables don't contain secrets in repo
@@ -108,7 +108,7 @@
 - [ ] `NEXTAUTH_URL` matches domain
 - [ ] Stripe keys (live, not test)
 - [ ] Email service keys configured
-- [ ] CRON_HMAC_SECRET set
+- [ ] CRON_SECRET set
 - [ ] Monitoring keys (Sentry, Datadog) configured
 - [ ] AWS credentials (if using CloudWatch)
 
@@ -166,7 +166,7 @@
 ### CRON Job Setup
 - [ ] GitHub Actions workflow created (or external CRON)
 - [ ] Runs daily at configured time
-- [ ] CRON_HMAC_SECRET matches production
+- [ ] CRON_SECRET matches production
 - [ ] Endpoint URL correct (https://yourdomain.com/api/cron/reminders)
 - [ ] CRON job success rate monitored
 - [ ] Failed reminders logged and alerted

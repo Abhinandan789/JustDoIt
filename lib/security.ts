@@ -5,23 +5,30 @@ import crypto from "crypto";
  * Prevents unauthorized access to time-sensitive cron endpoints
  *
  * @param payload - The request body/payload
- * @param signature - The X-Signature header value
+ * @param signature - The X-Signature header value (hex-encoded)
  * @param secret - The HMAC secret key
  * @returns true if signature is valid, false otherwise
+ * @throws Error if signature format is invalid
  */
 export function validateHmacSignature(
   payload: string,
   signature: string,
   secret: string
 ): boolean {
+  // Expected signature is hex-encoded, so verify it's valid hex
+  if (!/^[0-9a-f]{64}$/i.test(signature)) {
+    throw new Error("Invalid signature format: expected 64-character hex string");
+  }
+
   const expectedSignature = crypto
     .createHmac("sha256", secret)
     .update(payload)
     .digest("hex");
 
+  // Compare both as hex strings (same encoding)
   return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
+    Buffer.from(signature, "hex"),
+    Buffer.from(expectedSignature, "hex")
   );
 }
 

@@ -26,6 +26,18 @@ export type LoggerConfig = {
 };
 
 /**
+ * Interface for logger-like objects that can be mocked or extended
+ * Allows for flexible dependency injection in services
+ */
+export interface LoggerLike {
+  debug(message: string, options?: { error?: unknown; meta?: Record<string, unknown> }): void;
+  info(message: string, options?: { error?: unknown; meta?: Record<string, unknown> }): void;
+  warn(message: string, options?: { error?: unknown; meta?: Record<string, unknown> }): void;
+  error(message: string, error?: unknown, options?: { meta?: Record<string, unknown> }): void;
+  startTimer(): () => number;
+}
+
+/**
  * Structured logger with consistent formatting
  * Particularly useful for production debugging and error tracking
  */

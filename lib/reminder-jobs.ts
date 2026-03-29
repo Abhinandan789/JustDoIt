@@ -2,7 +2,7 @@ import { sendMissedTaskEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { runDailyStreakRollover } from "@/lib/streaks";
 import { retryBatch, countRetryResults } from "@/lib/retry-queue";
-import { createServiceLogger, type Logger } from "@/lib/logger";
+import { createServiceLogger, type Logger, type LoggerLike } from "@/lib/logger";
 
 type MissedTaskRecord = {
   id: string;
@@ -41,7 +41,7 @@ type MissedEmailDeps = {
   sendMissedTaskEmail: typeof sendMissedTaskEmail;
   markTaskEmailed: (taskId: string, processedAt: Date) => Promise<{ count: number }>;
   resetUserStreak: (userId: string) => Promise<unknown>;
-  logger: Logger;
+  logger: LoggerLike;
 };
 
 /**

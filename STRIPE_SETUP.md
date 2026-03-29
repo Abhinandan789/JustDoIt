@@ -253,10 +253,10 @@ The `User` model already includes subscription fields:
 ```prisma
 model User {
   // ... existing fields
-  tier              String  @default("FREE") // "FREE" | "PRO" | "ENTERPRISE"
+  tier              SubscriptionTier @default(FREE) // FREE | PRO | ENTERPRISE
   stripeCustomerId  String?
   subscriptionExpiresAt DateTime?
-  tasksLimit        Int? // null = unlimited
+  tasksLimit        Int @default(50)
 }
 ```
 

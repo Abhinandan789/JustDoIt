@@ -17,10 +17,17 @@ export const dynamic = "force-dynamic";
 async function isAuthorized(request: Request): Promise<boolean> {
   const cronSecret = process.env.CRON_SECRET;
 
-  // If no secret configured, allow request (development only)
+  // If no secret configured: deny in production, allow in development
   if (!cronSecret) {
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[cron] CRON_SECRET not configured in production - denying access. Configure CRON_SECRET to secure this endpoint."
+      );
+      return false;
+    }
+
     console.warn(
-      "[cron] CRON_SECRET not configured - endpoint is publicly accessible. Set CRON_SECRET in production!"
+      "[cron] CRON_SECRET not configured - endpoint is publicly accessible in non-production. Set CRON_SECRET before deploying to production!"
     );
     return true;
   }

@@ -44,17 +44,23 @@ export async function POST(req: NextRequest) {
     });
 
     // Handle webhook event
-    await handleStripeWebhook(event, async (userId, tier, expiresAt) => {
+    await handleStripeWebhook(event, async (userId, tier, expiresAt, customerId) => {
       await prisma.user.update({
         where: { id: userId },
         data: {
           tier: tier as "FREE" | "PRO" | "ENTERPRISE",
           subscriptionExpiresAt: expiresAt,
+          ...(customerId ? { stripeCustomerId: customerId } : {}),
         },
       });
 
       logger.info("User subscription updated", {
-        meta: { userId, tier, expiresAt: expiresAt?.toISOString() },
+        meta: {
+          userId,
+          tier,
+          expiresAt: expiresAt?.toISOString(),
+          stripeCustomerId: customerId ?? undefined,
+        },
       });
     });
 

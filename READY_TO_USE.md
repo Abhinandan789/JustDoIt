@@ -364,7 +364,7 @@ Deployment:
 → Check `RESEND_API_KEY` validity
 
 **"CRON job returns 401"**
-→ Verify `CRON_HMAC_SECRET` matches signature
+→ Verify `CRON_SECRET` matches signature
 
 **See full troubleshooting**: [DEPLOYMENT.md](DEPLOYMENT.md)
 
