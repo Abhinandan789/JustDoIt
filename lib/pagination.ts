@@ -20,8 +20,14 @@ export type PaginatedResult<T> = {
  * Prevents excessive queries and memory usage
  */
 export function validatePaginationLimit(limit?: number | string): number {
-  const parsed = typeof limit === "string" ? parseInt(limit, 10) : limit;
-  const numLimit = isNaN(parsed) ? 20 : parsed;
+  let numLimit = 20; // Default
+
+  if (typeof limit === "string") {
+    const parsed = parseInt(limit, 10);
+    numLimit = isNaN(parsed) ? 20 : parsed;
+  } else if (typeof limit === "number") {
+    numLimit = isNaN(limit) ? 20 : limit;
+  }
 
   // Enforce bounds: minimum 1, maximum 100
   if (numLimit < 1) return 1;
