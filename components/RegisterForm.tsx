@@ -47,15 +47,7 @@ function PasswordStrength({ password }: { password: string }) {
           <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < strength ? strengthColor : "bg-gray-200 dark:bg-gray-700"}`} />
         ))}
       </div>
-      <span className={`text-xs font-medium ${
-        strength <= 2
-          ? "text-red-600 dark:text-red-400"
-          : strength === 3
-          ? "text-yellow-600 dark:text-yellow-400"
-          : strength === 4
-          ? "text-blue-600 dark:text-blue-400"
-          : "text-emerald-600 dark:text-emerald-400"
-      }`}>
+      <span className={`text-xs font-medium ${strength <= 2 ? "text-red-600 dark:text-red-400" : strength === 3 ? "text-amber-600 dark:text-amber-400" : "text-gray-600 dark:text-gray-400"}`}>
         {strengthLevel}
       </span>
     </div>
@@ -110,7 +102,7 @@ export function RegisterForm() {
           name="username"
           required
           placeholder="johndoe"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         />
         {state.errors?.username && (
           <p className="text-xs text-red-600 dark:text-red-400 font-medium">
@@ -129,7 +121,7 @@ export function RegisterForm() {
           type="email"
           required
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         />
         {state.errors?.email && (
           <p className="text-xs text-red-600 dark:text-red-400 font-medium">
@@ -146,7 +138,7 @@ export function RegisterForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-xs text-gray-600 hover:text-gray-900 font-medium transition-colors dark:text-gray-400 dark:hover:text-gray-100"
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -159,7 +151,7 @@ export function RegisterForm() {
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         />
         <PasswordStrength password={password} />
         {state.errors?.password && (
@@ -177,7 +169,7 @@ export function RegisterForm() {
           id="timezone"
           name="timezone"
           defaultValue={Intl.DateTimeFormat().resolvedOptions().timeZone}
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         >
           {TIMEZONES.map((tz) => (
             <option key={tz} value={tz}>
@@ -213,7 +205,7 @@ export function RegisterForm() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors dark:text-blue-400 dark:hover:text-blue-300"
+          className="font-semibold text-black hover:text-gray-700 transition-colors dark:text-white dark:hover:text-gray-300"
         >
           Sign in
         </Link>

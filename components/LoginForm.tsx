@@ -56,7 +56,7 @@ export function LoginForm() {
           name="identifier"
           required
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         />
       </div>
 
@@ -68,7 +68,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-xs text-gray-600 hover:text-gray-900 font-medium transition-colors dark:text-gray-400 dark:hover:text-gray-100"
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -79,7 +79,7 @@ export function LoginForm() {
           type={showPassword ? "text" : "password"}
           required
           placeholder="••••••••"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10 dark:focus:border-white dark:focus:ring-white/10"
         />
       </div>
 
@@ -108,7 +108,7 @@ export function LoginForm() {
         Don{"'"}t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors dark:text-blue-400 dark:hover:text-blue-300"
+          className="font-semibold text-black hover:text-gray-700 transition-colors dark:text-white dark:hover:text-gray-300"
         >
           Create one
         </Link>
