@@ -2,19 +2,14 @@
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative min-h-screen flex items-center justify-center">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-rose-300 to-rose-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-blob" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10" style={{ animation: "blob 7s infinite 2s" }} />
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-gradient-to-br from-rose-300 to-rose-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10" style={{ animation: "blob 7s infinite 4s" }} />
-      </div>
+    <main className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 px-4 py-12">
+      {/* Decorative blur elements */}
+      <div className="absolute top-20 right-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-blob pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-blob animation-delay-2000 pointer-events-none" />
 
       {/* Content */}
-      <div className="relative px-4 py-12 w-full">
-        <div className="mx-auto w-full max-w-md">
-          {children}
-        </div>
+      <div className="relative z-10 w-full max-w-md">
+        {children}
       </div>
     </main>
   );

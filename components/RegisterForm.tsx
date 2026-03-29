@@ -69,19 +69,15 @@ function RegisterSubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className={`${buttonClass("primary", "w-full px-4 py-3 text-sm font-semibold")} relative overflow-hidden ${
+      className={`${buttonClass("primary", "w-full px-4 py-3 text-base")} ${
         pending ? "opacity-75" : ""
       }`}
     >
-      <span className="relative flex items-center justify-center">
+      <span className="flex items-center justify-center">
         {pending && (
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-          </span>
+          <span className="mr-2 w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
         )}
-        <span className={pending ? "invisible" : ""}>
-          {pending ? "Creating account..." : "Create Account"}
-        </span>
+        {pending ? "Creating account..." : "Create Account"}
       </span>
     </button>
   );
@@ -103,10 +99,10 @@ export function RegisterForm() {
   return (
     <form
       action={formAction}
-      className="space-y-5 rounded-2xl border border-gray-200 bg-white p-8 shadow-xl transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a]"
+      className="space-y-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 p-8 shadow-lg transition-all duration-200"
     >
       <div className="space-y-2">
-        <label htmlFor="username" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label htmlFor="username" className="block text-sm font-semibold text-gray-900 dark:text-white">
           Username
         </label>
         <input
@@ -114,17 +110,17 @@ export function RegisterForm() {
           name="username"
           required
           placeholder="johndoe"
-          className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:placeholder:text-gray-600 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
         />
         {state.errors?.username && (
-          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+          <p className="text-xs text-red-600 dark:text-red-400 font-medium">
             {state.errors.username}
           </p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label htmlFor="email" className="block text-sm font-semibold text-gray-900 dark:text-white">
           Email
         </label>
         <input
@@ -133,10 +129,10 @@ export function RegisterForm() {
           type="email"
           required
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:placeholder:text-gray-600 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
         />
         {state.errors?.email && (
-          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+          <p className="text-xs text-red-600 dark:text-red-400 font-medium">
             {state.errors.email}
           </p>
         )}
@@ -144,13 +140,13 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-900 dark:text-white">
             Password
           </label>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-xs text-rose-600 hover:text-rose-700 font-medium transition-colors dark:text-rose-400 dark:hover:text-rose-300"
+            className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors dark:text-blue-400 dark:hover:text-blue-300"
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -163,25 +159,25 @@ export function RegisterForm() {
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:placeholder:text-gray-600 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
         />
         <PasswordStrength password={password} />
         {state.errors?.password && (
-          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+          <p className="text-xs text-red-600 dark:text-red-400 font-medium">
             {state.errors.password}
           </p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="timezone" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label htmlFor="timezone" className="block text-sm font-semibold text-gray-900 dark:text-white">
           Timezone
         </label>
         <select
           id="timezone"
           name="timezone"
           defaultValue={Intl.DateTimeFormat().resolvedOptions().timeZone}
-          className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
         >
           {TIMEZONES.map((tz) => (
             <option key={tz} value={tz}>
@@ -193,17 +189,17 @@ export function RegisterForm() {
 
       {state.message && (
         <div
-          className={`rounded-lg p-3 border ${
+          className={`rounded-lg p-4 border ${
             state.ok
               ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/50"
-              : "bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-900/50"
+              : "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/50"
           }`}
         >
           <p
             className={`text-sm font-medium ${
               state.ok
                 ? "text-emerald-800 dark:text-emerald-300"
-                : "text-rose-800 dark:text-rose-300"
+                : "text-red-800 dark:text-red-300"
             }`}
           >
             {state.message}
@@ -217,7 +213,7 @@ export function RegisterForm() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-semibold text-rose-600 hover:text-rose-700 transition-colors dark:text-rose-400 dark:hover:text-rose-300"
+          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors dark:text-blue-400 dark:hover:text-blue-300"
         >
           Sign in
         </Link>

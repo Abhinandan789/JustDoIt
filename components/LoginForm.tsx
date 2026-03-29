@@ -45,10 +45,10 @@ export function LoginForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-5 rounded-2xl border border-gray-200 bg-white p-8 shadow-xl transition-all duration-200 dark:border-[#2a2a2a] dark:bg-[#1a1a1a]"
+      className="space-y-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 p-8 shadow-lg transition-all duration-200"
     >
       <div className="space-y-2">
-        <label htmlFor="identifier" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label htmlFor="identifier" className="block text-sm font-semibold text-gray-900 dark:text-white">
           Email or Username
         </label>
         <input
@@ -56,57 +56,51 @@ export function LoginForm() {
           name="identifier"
           required
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:placeholder:text-gray-600 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
         />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-900 dark:text-white">
             Password
           </label>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-xs text-rose-600 hover:text-rose-700 font-medium transition-colors dark:text-rose-400 dark:hover:text-rose-300"
+            className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors dark:text-blue-400 dark:hover:text-blue-300"
           >
             {showPassword ? "Hide" : "Show"}
           </button>
         </div>
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            required
-            placeholder="••••••••"
-            className="w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-rose-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 dark:border-[#303030] dark:bg-[#0f0f0f]/50 dark:text-gray-100 dark:placeholder:text-gray-600 dark:focus:border-rose-400 dark:focus:bg-[#141414]"
-          />
-        </div>
+        <input
+          id="password"
+          name="password"
+          type={showPassword ? "text" : "password"}
+          required
+          placeholder="••••••••"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+        />
       </div>
 
       {error && (
-        <div className="rounded-lg bg-rose-50 p-3 border border-rose-200 dark:bg-rose-950/30 dark:border-rose-900/50">
-          <p className="text-sm text-rose-800 dark:text-rose-300 font-medium">{error}</p>
+        <div className="rounded-lg bg-red-50 dark:bg-red-950/30 p-4 border border-red-200 dark:border-red-900/50">
+          <p className="text-sm text-red-800 dark:text-red-300 font-medium">{error}</p>
         </div>
       )}
 
       <button
         type="submit"
         disabled={pending}
-        className={`${buttonClass("primary", "w-full px-4 py-3 text-sm font-semibold")} relative overflow-hidden group ${
+        className={`${buttonClass("primary", "w-full px-4 py-3 text-base")} ${
           pending ? "opacity-75" : ""
         }`}
       >
-        <span className="relative flex items-center justify-center">
+        <span className="flex items-center justify-center">
           {pending && (
-            <span className="absolute inset-0 flex items-center justify-center">
-              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            </span>
+            <span className="mr-2 w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
           )}
-          <span className={pending ? "invisible" : ""}>
-            {pending ? "Logging in..." : "Sign In"}
-          </span>
+          {pending ? "Signing in..." : "Sign In"}
         </span>
       </button>
 
@@ -114,7 +108,7 @@ export function LoginForm() {
         Don{"'"}t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-rose-600 hover:text-rose-700 transition-colors dark:text-rose-400 dark:hover:text-rose-300"
+          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors dark:text-blue-400 dark:hover:text-blue-300"
         >
           Create one
         </Link>
