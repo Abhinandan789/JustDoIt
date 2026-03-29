@@ -1,4 +1,4 @@
-# Railway Deployment Guide - Complete Setup
+postgresql://neondb_owner:npg_rvqgkuA76WNs@ep-small-mud-a8kvmj9v-pooler.eastus2.azure.neon.tech/JustDoIt?sslmode=require&channel_binding=require# Railway Deployment Guide - Complete Setup
 
 ## Step 1: Get Neon Database (5 mins)
 
