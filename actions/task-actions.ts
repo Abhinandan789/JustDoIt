@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { parseLocalDateTimeToUTC } from "@/lib/timezone";
 import { taskInputSchema, updateTaskInputSchema } from "@/lib/validations";
 import { initialActionState, type ActionState } from "@/types/actions";
+import { getUserCapabilities, checkTaskLimit, getUpgradePrompt } from "@/lib/feature-gates";
 
 function parseTaskFields(formData: FormData) {
   return {
@@ -42,6 +43,21 @@ export async function createTaskAction(
 
   if (!user) {
     return { ok: false, message: "Unauthorized" };
+  }
+
+  // Check if user has reached their task limit
+  const capabilities = getUserCapabilities(user);
+  const taskCount = await prisma.task.count({ where: { userId: user.id } });
+  const limitCheck = checkTaskLimit(capabilities, taskCount);
+
+  if (!limitCheck.canCreateTask) {
+    return {
+      ok: false,
+      message: limitCheck.message,
+      errors: {
+        form: `${limitCheck.message} - ${getUpgradePrompt("unlimited_tasks")}`,
+      },
+    };
   }
 
   const parsed = taskInputSchema.safeParse(parseTaskFields(formData));
