@@ -19,17 +19,36 @@ enum TaskPriority {
   URGENT
 }
 
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
 model User {
-  id            String         @id @default(cuid())
-  username      String         @unique
-  email         String         @unique
+  id            String               @id @default(cuid())
+  username      String               @unique
+  email         String               @unique
   passwordHash  String
   profileImage  String?
-  timezone      String         @default("UTC")
-  currentStreak Int            @default(0)
-  longestStreak Int            @default(0)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  timezone      String               @default("UTC")
+  currentStreak Int                  @default(0)
+  longestStreak Int                  @default(0)
+  
+  // Subscription and feature flags
+  tier          SubscriptionTier     @default(FREE)
+  stripeCustomerId String?           // For Stripe integration
+  subscriptionExpiresAt DateTime?    // When subscription expires (null = lifetime)
+  
+  // Feature limits (based on tier)
+  tasksLimit    Int                  @default(50) // FREE: 50, PRO: 500, ENTERPRISE: unlimited
+  analyticsExportEnabled Boolean     @default(false) // PRO+: true
+  customRemindersEnabled Boolean     @default(false) // PRO+: true
+  apiAccessEnabled Boolean           @default(false) // ENTERPRISE+: true
+  
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
   tasks         Task[]
   focusSessions FocusSession[]
 }
@@ -52,6 +71,8 @@ model Task {
   @@index([userId, status])
   @@index([status, eodDeadline, missedEmailSentAt])
   @@index([userId, eodDeadline])
+  @@index([userId, createdAt])
+  @@index([userId, status, eodDeadline])
 }
 
 model FocusSession {
@@ -66,4 +87,5 @@ model FocusSession {
 
   @@index([userId, completedAt])
   @@index([taskId])
+  @@index([userId, taskId])
 }

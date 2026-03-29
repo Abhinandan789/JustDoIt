@@ -28,56 +28,88 @@ export async function resetUserStreak(userId: string) {
 }
 
 export async function runDailyStreakRollover(now = new Date()) {
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      timezone: true,
-      currentStreak: true,
-      longestStreak: true,
-    },
-  });
+  /**
+   * Process users in batches to prevent memory exhaustion
+   * With 1M users, loading all at once = ~1GB RAM spike
+   * Batching at 1000 = constant ~1-5MB memory usage
+   */
+  const BATCH_SIZE = 1000;
+  let skip = 0;
+  let processedCount = 0;
+  let updatedCount = 0;
 
-  for (const user of users) {
-    if (!shouldRunDailyRollover(now, user.timezone)) {
-      continue;
-    }
-
-    const bounds = getPreviousLocalDayBounds(now, user.timezone);
-
-    const previousDayTasks = await prisma.task.findMany({
-      where: {
-        userId: user.id,
-        eodDeadline: {
-          gte: bounds.start,
-          lt: bounds.end,
-        },
-      },
+  while (true) {
+    const users = await prisma.user.findMany({
       select: {
-        status: true,
-        completedAt: true,
-        eodDeadline: true,
+        id: true,
+        timezone: true,
+        currentStreak: true,
+        longestStreak: true,
       },
+      skip,
+      take: BATCH_SIZE,
     });
 
-    const hasMissedTask = previousDayTasks.some(
-      (task) => task.status === "PENDING" || (task.completedAt && task.completedAt > task.eodDeadline),
-    );
+    if (users.length === 0) {
+      break; // No more users to process
+    }
 
-    if (hasMissedTask) {
+    for (const user of users) {
+      processedCount++;
+
+      if (!shouldRunDailyRollover(now, user.timezone)) {
+        continue;
+      }
+
+      const bounds = getPreviousLocalDayBounds(now, user.timezone);
+
+      const previousDayTasks = await prisma.task.findMany({
+        where: {
+          userId: user.id,
+          eodDeadline: {
+            gte: bounds.start,
+            lt: bounds.end,
+          },
+        },
+        select: {
+          status: true,
+          completedAt: true,
+          eodDeadline: true,
+        },
+      });
+
+      const hasMissedTask = previousDayTasks.some(
+        (task) => task.status === "PENDING" || (task.completedAt && task.completedAt > task.eodDeadline),
+      );
+
+      if (hasMissedTask) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { currentStreak: 0 },
+        });
+        updatedCount++;
+        continue;
+      }
+
+      const nextStreak = user.currentStreak + 1;
       await prisma.user.update({
         where: { id: user.id },
-        data: { currentStreak: 0 },
+        data: {
+          currentStreak: nextStreak,
+          longestStreak: Math.max(user.longestStreak, nextStreak),
+        },
       });
-      continue;
+      updatedCount++;
     }
 
-    const nextStreak = user.currentStreak + 1;
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        currentStreak: nextStreak,
-        longestStreak: Math.max(user.longestStreak, nextStreak),
-      },
-    });
+    // Move to next batch
+    skip += BATCH_SIZE;
   }
+
+  // Log processing summary for monitoring
+  console.log(
+    `[streaks] Daily rollover completed: processed ${processedCount} users, updated ${updatedCount} streaks`
+  );
+
+  return { processedCount, updatedCount };
 }

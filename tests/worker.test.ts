@@ -1,4 +1,6 @@
+import { describe, it, expect, vi } from "vitest";
 import { processMissedTaskEmailsWithDeps } from "@/lib/reminder-jobs";
+import type { LoggerLike } from "@/lib/logger";
 
 const task = {
   id: "task_1",
@@ -12,6 +14,14 @@ const task = {
   },
 };
 
+const mockLogger: LoggerLike = {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  startTimer: vi.fn(() => () => 100),
+};
+
 describe("reminder worker", () => {
   it("sends missed email once and updates marker", async () => {
     const markTaskEmailed = vi.fn().mockResolvedValue({ count: 1 });
@@ -23,7 +33,7 @@ describe("reminder worker", () => {
         sendMissedTaskEmail: vi.fn().mockResolvedValue({ ok: true }),
         markTaskEmailed,
         resetUserStreak,
-        logError: vi.fn(),
+        logger: mockLogger,
       },
       new Date("2026-03-02T17:00:00.000Z"),
     );
@@ -42,7 +52,7 @@ describe("reminder worker", () => {
         sendMissedTaskEmail: vi.fn().mockResolvedValue({ ok: false, error: "boom" }),
         markTaskEmailed,
         resetUserStreak,
-        logError: vi.fn(),
+        logger: mockLogger,
       },
       new Date(),
     );
@@ -52,7 +62,7 @@ describe("reminder worker", () => {
   });
 
   it("logs errors and keeps processing", async () => {
-    const logError = vi.fn();
+    const logger = { ...mockLogger };
 
     await processMissedTaskEmailsWithDeps(
       {
@@ -60,11 +70,11 @@ describe("reminder worker", () => {
         sendMissedTaskEmail: vi.fn().mockRejectedValue(new Error("network")),
         markTaskEmailed: vi.fn(),
         resetUserStreak: vi.fn(),
-        logError,
+        logger,
       },
       new Date(),
     );
 
-    expect(logError).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
   });
 });
