@@ -2,6 +2,7 @@ import { sendMissedTaskEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { runDailyStreakRollover } from "@/lib/streaks";
 import { retryBatch, countRetryResults } from "@/lib/retry-queue";
+import { createServiceLogger, type Logger } from "@/lib/logger";
 
 type MissedTaskRecord = {
   id: string;
@@ -40,7 +41,7 @@ type MissedEmailDeps = {
   sendMissedTaskEmail: typeof sendMissedTaskEmail;
   markTaskEmailed: (taskId: string, processedAt: Date) => Promise<{ count: number }>;
   resetUserStreak: (userId: string) => Promise<unknown>;
-  logError: (message: string, error?: unknown) => void;
+  logger: Logger;
 };
 
 /**
@@ -48,19 +49,26 @@ type MissedEmailDeps = {
  * Improved from previous version to handle transient failures gracefully
  */
 export async function processMissedTaskEmailsWithDeps(deps: MissedEmailDeps, now = new Date()) {
+  const timer = deps.logger.startTimer();
   const missedTasks = await deps.fetchMissedTasks(now);
 
   if (missedTasks.length === 0) {
-    console.log("[worker] No missed tasks to process");
+    deps.logger.debug("No missed tasks to process");
     return 0;
   }
+
+  deps.logger.info(`Processing ${missedTasks.length} missed task emails with retry...`, {
+    meta: { taskCount: missedTasks.length },
+  });
 
   // First, reset streaks for all missed tasks (this is not retryable)
   for (const task of missedTasks) {
     try {
       await deps.resetUserStreak(task.userId);
     } catch (error) {
-      deps.logError(`[worker] Failed to reset streak for user ${task.userId}`, error);
+      deps.logger.error(`Failed to reset streak for user ${task.userId}`, error, {
+        meta: { userId: task.userId },
+      });
     }
   }
 
@@ -76,8 +84,6 @@ export async function processMissedTaskEmailsWithDeps(deps: MissedEmailDeps, now
         timezone: task.user.timezone,
       }),
   }));
-
-  console.log(`[worker] Processing ${missedTasks.length} missed task emails with retry...`);
 
   const results = await retryBatch(emailOperations, {
     maxAttempts: 3,
@@ -98,29 +104,40 @@ export async function processMissedTaskEmailsWithDeps(deps: MissedEmailDeps, now
       try {
         await deps.markTaskEmailed(taskId, now);
         successCount++;
-        console.log(`[worker] ✓ Email sent for task ${taskId} (${result.attemptsMade} attempt(s))`);
+        deps.logger.debug("Email sent for task", {
+          meta: { taskId, attempts: result.attemptsMade, durationMs: result.totalDurationMs },
+        });
       } catch (error) {
-        deps.logError(`[worker] Failed to mark task ${taskId} as emailed`, error);
+        deps.logger.error(`Failed to mark task ${taskId} as emailed`, error, {
+          meta: { taskId },
+        });
         failureCount++;
       }
     } else {
       failureCount++;
       const reason = emailResult?.error || result.error?.message || "unknown error";
-      deps.logError(
-        `[worker] ✗ Failed to send email for task ${taskId} after ${result.attemptsMade} attempts: ${reason}`
-      );
+      deps.logger.warn(`Failed to send email for task after ${result.attemptsMade} attempts`, {
+        meta: { taskId, attempts: result.attemptsMade, reason },
+      });
     }
   }
 
-  const summary = { successCount, failureCount, totalDurationMs: results[results.length - 1]?.result.totalDurationMs || 0 };
-  console.log(
-    `[worker] Email processing complete: ${successCount} succeeded, ${failureCount} failed, ${summary.totalDurationMs}ms total`
-  );
+  const totalDuration = timer();
+  deps.logger.info("Email processing completed", {
+    meta: {
+      succeeded: successCount,
+      failed: failureCount,
+      total: missedTasks.length,
+      durationMs: totalDuration,
+    },
+  });
 
   return successCount;
 }
 
 export async function processMissedTaskEmails(now = new Date()) {
+  const logger = createServiceLogger("worker:emails");
+
   return processMissedTaskEmailsWithDeps(
     {
       fetchMissedTasks,
@@ -135,14 +152,28 @@ export async function processMissedTaskEmails(now = new Date()) {
           where: { id: userId },
           data: { currentStreak: 0 },
         }),
-      logError: (message: string, error?: unknown) => console.error(message, error),
+      logger,
     },
     now,
   );
 }
 
 export async function workerTick(now = new Date()) {
-  const processedTasks = await processMissedTaskEmails(now);
-  await runDailyStreakRollover(now);
-  return processedTasks;
+  const logger = createServiceLogger("worker:tick");
+  const timer = logger.startTimer();
+
+  try {
+    const processedTasks = await processMissedTaskEmails(now);
+    await runDailyStreakRollover(now);
+
+    const duration = timer();
+    logger.info("Worker tick completed", {
+      meta: { processedTasks, durationMs: duration },
+    });
+
+    return processedTasks;
+  } catch (error) {
+    logger.error("Worker tick failed", error);
+    throw error;
+  }
 }
