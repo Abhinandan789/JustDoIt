@@ -47,3 +47,13 @@ prisma/*.db-journal
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# IDE / editor directories
+.vs/
+.idea/
+*.suo
+*.user
+
+# build artifacts and logs
+build.log
+*.log
