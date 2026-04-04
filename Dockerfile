@@ -32,6 +32,7 @@ WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV=production
+ENV PORT=3000
 
 # Copy package files
 COPY package*.json ./
@@ -46,14 +47,18 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/middleware.ts ./
+COPY scripts/ ./scripts/
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
 
+# Set permissions for nextjs user
+RUN chown -R nextjs:nodejs /app
+
 USER nextjs
 
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start"]
+# Start the application with migration handling
+CMD ["node", "scripts/start.js"]
