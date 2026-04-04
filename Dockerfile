@@ -1,7 +1,7 @@
 # Multi-stage build for JustDoIt Next.js app optimized for Railway/Docker
 
 # Build stage
-FROM node:18.20.5-alpine AS builder
+FROM node:20.17-alpine AS builder
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18.20.5-alpine
+FROM node:20.17-alpine
 
 WORKDIR /app
 
