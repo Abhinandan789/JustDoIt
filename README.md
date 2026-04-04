@@ -71,6 +71,41 @@ Visit `http://localhost:3000` and login with:
 - Email: `test@example.com`
 - Password: `TestPassword123`
 
+## 🚀 Production Deployment (Railway)
+
+The app is **production-ready and pre-configured for Railway**.
+
+### Quick Deploy (5 minutes)
+
+**Option 1: Using Setup Script (Windows)**
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/setup-railway.ps1
+```
+
+**Option 2: Manual Setup**
+1. Go to [railway.app](https://railway.app)
+2. Create a PostgreSQL database in your project
+3. Add these environment variables to your JustDoIt service:
+   ```
+   DATABASE_URL=[auto-populated from PostgreSQL]
+   AUTH_SECRET=[generate: openssl rand -base64 32]
+   NEXTAUTH_SECRET=[same as AUTH_SECRET]
+   CRON_SECRET=[generate: openssl rand -base64 32]
+   AUTH_URL=https://your-railway-domain.up.railway.app
+   NEXTAUTH_URL=https://your-railway-domain.up.railway.app
+   APP_BASE_URL=https://your-railway-domain.up.railway.app
+   NODE_ENV=production
+   ```
+4. Railway auto-deploys on git push
+
+**✅ Auto-Features Enabled:**
+- Continuous deployment on git push
+- Auto HTTPS with Railway domain
+- Zero-downtime deployments
+- Auto-database backups
+
+See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed instructions.
+
 ### Environment Variables
 
 ```env
