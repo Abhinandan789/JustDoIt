@@ -104,7 +104,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup-railway.ps1
 - Zero-downtime deployments
 - Auto-database backups
 
-See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed instructions.
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
 
 ### Environment Variables
 
@@ -223,6 +223,17 @@ npx prisma migrate deploy
 ## Contributing
 
 Contributions welcome! See commit history for code style examples.
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [docs/QUICK_START.md](./docs/QUICK_START.md) | Step-by-step local setup guide |
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Full production deployment guide (Railway, Vercel) |
+| [docs/RAILWAY_ENV_SETUP.md](./docs/RAILWAY_ENV_SETUP.md) | Railway environment variable reference |
+| [docs/API.md](./docs/API.md) | REST API endpoint documentation |
+| [docs/STRIPE_SETUP.md](./docs/STRIPE_SETUP.md) | Stripe billing integration guide |
+| [docs/MONITORING.md](./docs/MONITORING.md) | Logging, alerting, and monitoring setup |
 
 ## License
 
