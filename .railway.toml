@@ -1,0 +1,35 @@
+# Railway Configuration for JustDoIt Next.js App
+
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm run start"
+restartPolicyMaxRetries = 5
+numReplicas = 1
+
+# Environment setup
+[env]
+NODE_ENV = "production"
+NODE_OPTIONS = "--max-old-space-size=2048"
+
+# Build nixpacks config
+[nixpacks]
+# Ensure proper Node version
+providers = ["node", "pnpm"]
+
+[[nixpacks.apt]]
+packages = ["pkg-config", "build-essential"]
+
+[[nixpacks.buildCommands]]
+# Install dependencies
+commands = [
+  "npm ci --omit=dev",
+  "npm run prisma:generate",
+  "npm run build"
+]
+
+# Post-build - run any migrations if needed
+[[nixpacks.deployCommands]]
+commands = ["npm run prisma:deploy"]
